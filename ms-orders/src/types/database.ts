@@ -31,7 +31,7 @@ export type OrderItemUpdate = Updateable<OrderItemsTable>
 // ─── order_events ───────────────────────────────────────────────────────────
 
 export interface OrderEventsTable {
-  id: Generated<string>
+  id: Generated<string> | string  // aceita UUID externo para idempotência
   order_id: string
   type: string
   data: unknown

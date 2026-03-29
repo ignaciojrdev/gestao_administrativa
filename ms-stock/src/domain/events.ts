@@ -22,11 +22,18 @@ export interface StockReleasedData {
   order_id: string
 }
 
+// Consumo definitivo ao fechar pedido: decrementa quantity E reserved
+export interface StockConsumedData {
+  quantity: number
+  order_id: string
+}
+
 export type StockEventData =
   | StockInData
   | StockOutData
   | StockReservedData
   | StockReleasedData
+  | StockConsumedData
 
 export interface DomainEvent<T extends StockEventData = StockEventData> {
   type: StockEventType

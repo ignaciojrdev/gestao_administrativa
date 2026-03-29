@@ -1,7 +1,7 @@
 import type { Kysely } from 'kysely'
 import { STOCK_EVENT_TYPE } from '../constants/stock.constants.js'
 import type { Database } from '../types/database.js'
-import type { DomainEvent, StockInData, StockOutData, StockReservedData, StockReleasedData } from '../domain/events.js'
+import type { DomainEvent, StockInData, StockOutData, StockReservedData, StockReleasedData, StockConsumedData } from '../domain/events.js'
 
 export async function applyEventToProjection(
   db: Kysely<Database>,
@@ -54,6 +54,20 @@ export async function applyEventToProjection(
       await db
         .updateTable('stock_projection')
         .set((eb) => ({
+          reserved: eb('reserved', '-', d.quantity),
+          updated_at: new Date(),
+        }))
+        .where('variant_id', '=', event.variant_id)
+        .execute()
+      break
+    }
+
+    case STOCK_EVENT_TYPE.STOCK_CONSUMED: {
+      const d = event.data as StockConsumedData
+      await db
+        .updateTable('stock_projection')
+        .set((eb) => ({
+          quantity: eb('quantity', '-', d.quantity),
           reserved: eb('reserved', '-', d.quantity),
           updated_at: new Date(),
         }))

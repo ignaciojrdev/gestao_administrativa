@@ -10,6 +10,7 @@ import { z } from 'zod'
 export const ReleaseStockSchema = z.object({
   quantity: z.number().int().positive(),
   order_id: z.string().uuid(),
+  idempotency_key: z.string().uuid().optional(),
 })
 
 export type ReleaseStockInput = z.infer<typeof ReleaseStockSchema>
@@ -32,5 +33,5 @@ export async function releaseStockCommand(
     data: { quantity: input.quantity, order_id: input.order_id },
   }
 
-  await persistEvent(event)
+  await persistEvent(event, input.idempotency_key)
 }

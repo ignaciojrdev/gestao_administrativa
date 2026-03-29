@@ -2,7 +2,7 @@ import { STOCK_EVENT_TYPE } from '../constants/stock.constants.js'
 import { BusinessError } from '../helpers/errors.js'
 import { t } from '../i18n/index.js'
 import type { StockEvent } from '../types/database.js'
-import type { StockInData, StockOutData, StockReservedData, StockReleasedData } from './events.js'
+import type { StockInData, StockOutData, StockReservedData, StockReleasedData, StockConsumedData } from './events.js'
 
 export interface StockState {
   variant_id: string
@@ -34,6 +34,12 @@ export function rebuildStockState(events: StockEvent[]): StockState {
       }
       case STOCK_EVENT_TYPE.STOCK_RELEASED: {
         const d = event.data as StockReleasedData
+        reserved -= d.quantity
+        break
+      }
+      case STOCK_EVENT_TYPE.STOCK_CONSUMED: {
+        const d = event.data as StockConsumedData
+        quantity -= d.quantity
         reserved -= d.quantity
         break
       }

@@ -4,6 +4,7 @@ import { stockInCommand, StockInSchema } from '../commands/stock/stock-in.comman
 import { stockOutCommand, StockOutSchema } from '../commands/stock/stock-out.command.js'
 import { reserveStockCommand, ReserveStockSchema } from '../commands/stock/reserve-stock.command.js'
 import { releaseStockCommand, ReleaseStockSchema } from '../commands/stock/release-stock.command.js'
+import { consumeStockCommand, ConsumeStockSchema } from '../commands/stock/consume-stock.command.js'
 import { getStockQuery } from '../queries/stock/get-stock.query.js'
 import { listStockQuery, ListStockSchema } from '../queries/stock/list-stock.query.js'
 
@@ -52,6 +53,14 @@ export async function stockRoute(app: FastifyInstance): Promise<void> {
     if (!body) return
 
     await releaseStockCommand(request.params.variantId, body)
+    return reply.status(204).send()
+  })
+
+  app.post<{ Params: { variantId: string } }>('/stock/:variantId/consume', async (request, reply) => {
+    const body = parseOrFail(ConsumeStockSchema, request.body, reply)
+    if (!body) return
+
+    await consumeStockCommand(request.params.variantId, body)
     return reply.status(204).send()
   })
 }

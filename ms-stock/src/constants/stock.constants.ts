@@ -3,6 +3,7 @@ export const STOCK_EVENT_TYPE = {
   STOCK_OUT: 'StockOut',
   STOCK_RESERVED: 'StockReserved',
   STOCK_RELEASED: 'StockReleased',
+  STOCK_CONSUMED: 'StockConsumed',
 } as const
 
 export type StockEventType = (typeof STOCK_EVENT_TYPE)[keyof typeof STOCK_EVENT_TYPE]

@@ -7,6 +7,11 @@ export const ptBR = {
     database_url_required: 'A variável de ambiente DATABASE_URL é obrigatória',
     internal_error: 'Erro interno do servidor',
     validation_error: 'Erro de validação',
+    stock_service_unavailable: 'Serviço de estoque indisponível',
+    stock_reserve_failed: 'Não foi possível reservar o estoque para a variante {{variantId}}',
+    stock_release_failed: 'Não foi possível liberar o estoque para a variante {{variantId}}',
+    stock_consume_failed: 'Não foi possível confirmar o consumo de estoque para a variante {{variantId}}',
+    stock_url_required: 'A variável de ambiente STOCK_SERVICE_URL é obrigatória',
   },
   order_status: {
     open: 'aberto',
