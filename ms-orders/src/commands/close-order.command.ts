@@ -1,0 +1,22 @@
+import { loadOpenOrder } from '../helpers/load-order-state.js'
+import { persistEvent } from '../helpers/persist-event.js'
+import { ORDER_EVENT_TYPE } from '../constants/order.constants.js'
+import { BusinessError } from '../helpers/errors.js'
+import { t } from '../i18n/index.js'
+import type { DomainEvent, OrderClosedData } from '../domain/events.js'
+
+export async function closeOrderCommand(orderId: string): Promise<void> {
+  const state = await loadOpenOrder(orderId)
+
+  if (state.items.length === 0) {
+    throw new BusinessError(t('errors.close_empty_order'))
+  }
+
+  const event: DomainEvent<OrderClosedData> = {
+    type: ORDER_EVENT_TYPE.ORDER_CLOSED,
+    order_id: orderId,
+    data: { closed_at: new Date().toISOString() },
+  }
+
+  await persistEvent(event)
+}
