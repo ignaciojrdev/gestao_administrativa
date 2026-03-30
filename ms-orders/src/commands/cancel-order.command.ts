@@ -28,7 +28,7 @@ export async function cancelOrderCommand(
           variantId: item.variant_id,
           quantity: item.quantity,
           orderId,
-          idempotencyKey: `${eventId}-${item.id}`,
+          idempotencyKey: randomUUID(),
         }),
       ),
     )

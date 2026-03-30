@@ -24,7 +24,6 @@ describe('stockOutCommand', () => {
         variant_id: 'var-1',
         data: { quantity: 10, reason: 'manual' },
       }),
-      undefined,
     )
   })
 

@@ -1,0 +1,374 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Gestão Administrativa",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "ms_orders", "value": "http://localhost:3001", "type": "string" },
+    { "key": "ms_stock", "value": "http://localhost:3002", "type": "string" },
+    { "key": "order_id", "value": "", "type": "string" },
+    { "key": "item_id", "value": "", "type": "string" },
+    { "key": "product_id", "value": "", "type": "string" },
+    { "key": "variant_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "ms-stock",
+      "item": [
+        {
+          "name": "Produtos",
+          "item": [
+            {
+              "name": "Criar produto",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "var res = pm.response.json();",
+                      "if (res.id) { pm.collectionVariables.set('product_id', res.id); }"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"X-Burguer\",\n  \"description\": \"Hamburguer classico\"\n}"
+                },
+                "url": {
+                  "raw": "{{ms_stock}}/products",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["products"]
+                }
+              }
+            },
+            {
+              "name": "Listar produtos",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{ms_stock}}/products?page=1&limit=20",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["products"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "20" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Buscar produto por ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{ms_stock}}/products/{{product_id}}",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["products", "{{product_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Criar variante",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "var res = pm.response.json();",
+                      "if (res.id) { pm.collectionVariables.set('variant_id', res.id); }"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sku\": \"XB-001\",\n  \"name\": \"X-Burguer 200g\"\n}"
+                },
+                "url": {
+                  "raw": "{{ms_stock}}/products/{{product_id}}/variants",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["products", "{{product_id}}", "variants"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estoque",
+          "item": [
+            {
+              "name": "Listar estoque",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{ms_stock}}/stock?page=1&limit=20",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["stock"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "20" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Buscar estoque da variante",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{ms_stock}}/stock/{{variant_id}}",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["stock", "{{variant_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Entrada de estoque (StockIn)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 100,\n  \"reason\": \"purchase\"\n}"
+                },
+                "url": {
+                  "raw": "{{ms_stock}}/stock/{{variant_id}}/in",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["stock", "{{variant_id}}", "in"]
+                }
+              }
+            },
+            {
+              "name": "Saida de estoque (StockOut)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 10,\n  \"reason\": \"loss\"\n}"
+                },
+                "url": {
+                  "raw": "{{ms_stock}}/stock/{{variant_id}}/out",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["stock", "{{variant_id}}", "out"]
+                }
+              }
+            },
+            {
+              "name": "Reservar estoque",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 5,\n  \"order_id\": \"test-order-123\",\n  \"idempotency_key\": \"reserve-test-001\"\n}"
+                },
+                "url": {
+                  "raw": "{{ms_stock}}/stock/{{variant_id}}/reserve",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["stock", "{{variant_id}}", "reserve"]
+                }
+              }
+            },
+            {
+              "name": "Liberar reserva",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 5,\n  \"order_id\": \"test-order-123\",\n  \"idempotency_key\": \"release-test-001\"\n}"
+                },
+                "url": {
+                  "raw": "{{ms_stock}}/stock/{{variant_id}}/release",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["stock", "{{variant_id}}", "release"]
+                }
+              }
+            },
+            {
+              "name": "Consumir reserva",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 5,\n  \"order_id\": \"test-order-123\",\n  \"idempotency_key\": \"consume-test-001\"\n}"
+                },
+                "url": {
+                  "raw": "{{ms_stock}}/stock/{{variant_id}}/consume",
+                  "host": ["{{ms_stock}}"],
+                  "path": ["stock", "{{variant_id}}", "consume"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ms-orders",
+      "item": [
+        {
+          "name": "Criar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.id) { pm.collectionVariables.set('order_id', res.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"table_number\": 5\n}"
+            },
+            "url": {
+              "raw": "{{ms_orders}}/orders",
+              "host": ["{{ms_orders}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Listar pedidos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ms_orders}}/orders?page=1&limit=20",
+              "host": ["{{ms_orders}}"],
+              "path": ["orders"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "status", "value": "open", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar pedido por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ms_orders}}/orders/{{order_id}}",
+              "host": ["{{ms_orders}}"],
+              "path": ["orders", "{{order_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Adicionar item ao pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.item_id) { pm.collectionVariables.set('item_id', res.item_id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variant_id\": \"{{variant_id}}\",\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{ms_orders}}/orders/{{order_id}}/items",
+              "host": ["{{ms_orders}}"],
+              "path": ["orders", "{{order_id}}", "items"]
+            }
+          }
+        },
+        {
+          "name": "Remover item do pedido",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{ms_orders}}/orders/{{order_id}}/items/{{item_id}}",
+              "host": ["{{ms_orders}}"],
+              "path": ["orders", "{{order_id}}", "items", "{{item_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Fechar pedido",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{ms_orders}}/orders/{{order_id}}/close",
+              "host": ["{{ms_orders}}"],
+              "path": ["orders", "{{order_id}}", "close"]
+            }
+          }
+        },
+        {
+          "name": "Cancelar pedido",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"cliente desistiu\"\n}"
+            },
+            "url": {
+              "raw": "{{ms_orders}}/orders/{{order_id}}/cancel",
+              "host": ["{{ms_orders}}"],
+              "path": ["orders", "{{order_id}}", "cancel"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

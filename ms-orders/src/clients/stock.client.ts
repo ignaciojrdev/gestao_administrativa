@@ -43,7 +43,9 @@ async function post(path: string, body: object): Promise<void> {
 
   if (!res.ok) {
     const payload = await res.json().catch(() => ({}))
-    throw new BusinessError((payload as { error?: string }).error ?? res.statusText)
+    const error = (payload as { error?: unknown }).error
+    const message = typeof error === 'string' ? error : JSON.stringify(error) ?? res.statusText
+    throw new BusinessError(message)
   }
 }
 

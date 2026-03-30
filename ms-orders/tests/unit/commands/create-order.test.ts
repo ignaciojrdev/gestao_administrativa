@@ -27,7 +27,6 @@ describe('createOrderCommand', () => {
         type: ORDER_EVENT_TYPE.ORDER_CREATED,
         data: { table_number: 3 },
       }),
-      expect.any(String),
     )
   })
 

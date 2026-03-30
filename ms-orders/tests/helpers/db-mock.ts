@@ -38,8 +38,10 @@ export function createDbMock() {
   // ─── delete chain ─────────────────────────────────────────────────────────
 
   const deleteExecute = vi.fn().mockResolvedValue([])
-  const deleteWhere = vi.fn().mockReturnValue({ execute: deleteExecute })
-  const deleteFrom = vi.fn().mockReturnValue({ where: deleteWhere })
+  const deleteWhere: ReturnType<typeof vi.fn> = vi.fn()
+  const deleteChain = { where: deleteWhere, execute: deleteExecute }
+  deleteWhere.mockReturnValue(deleteChain)
+  const deleteFrom = vi.fn().mockReturnValue(deleteChain)
 
   // ─── transaction ──────────────────────────────────────────────────────────
 
@@ -68,8 +70,11 @@ export function createDbMock() {
     mocks: {
       execute, executeTakeFirst, executeTakeFirstOrThrow,
       insertExecute, updateExecute, deleteExecute,
-      where, selectFrom: db.selectFrom, values, insertInto,
-      updateTable, set, updateWhere, transaction,
+      where, offset, limit, orderBy,
+      selectFrom: db.selectFrom, values, insertInto,
+      updateTable, set, updateWhere,
+      deleteFrom, deleteWhere,
+      transaction,
     },
   }
 }
