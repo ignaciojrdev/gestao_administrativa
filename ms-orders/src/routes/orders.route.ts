@@ -7,6 +7,7 @@ import { closeOrderCommand } from '../commands/close-order.command.js'
 import { cancelOrderCommand, CancelOrderSchema } from '../commands/cancel-order.command.js'
 import { getOrderQuery } from '../queries/get-order.query.js'
 import { listOrdersQuery, ListOrdersSchema } from '../queries/list-orders.query.js'
+import { listOrderItemsQuery, ListOrderItemsSchema } from '../queries/list-order-items.query.js'
 
 export async function ordersRoute(app: FastifyInstance): Promise<void> {
   // ─── Queries ──────────────────────────────────────────────────────────────
@@ -20,6 +21,13 @@ export async function ordersRoute(app: FastifyInstance): Promise<void> {
 
   app.get<{ Params: { id: string } }>('/orders/:id', async (request, reply) => {
     return reply.send(await getOrderQuery(request.params.id))
+  })
+
+  app.get<{ Params: { id: string } }>('/orders/:id/items', async (request, reply) => {
+    const input = parseOrFail(ListOrderItemsSchema, request.query, reply)
+    if (!input) return
+
+    return reply.send(await listOrderItemsQuery(request.params.id, input))
   })
 
   // ─── Commands ─────────────────────────────────────────────────────────────

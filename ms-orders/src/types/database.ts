@@ -5,6 +5,8 @@ import type { Generated, Insertable, Selectable, Updateable } from 'kysely'
 export interface OrdersTable {
   id: Generated<string>
   status: string
+  table_number: number | null
+  total: number
   created_at: Generated<Date>
   updated_at: Generated<Date>
 }
@@ -20,6 +22,7 @@ export interface OrderItemsTable {
   order_id: string
   variant_id: string
   quantity: number
+  unit_price: number
   status: string
   created_at: Generated<Date>
 }

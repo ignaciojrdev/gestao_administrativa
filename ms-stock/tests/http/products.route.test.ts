@@ -17,6 +17,14 @@ vi.mock('../../src/commands/products/create-variant.command.js', async (importOr
   return { ...mod, createVariantCommand: vi.fn() }
 })
 
+vi.mock('../../src/commands/products/delete-product.command.js', () => ({
+  deleteProductCommand: vi.fn(),
+}))
+
+vi.mock('../../src/commands/products/delete-variant.command.js', () => ({
+  deleteVariantCommand: vi.fn(),
+}))
+
 // ─── Mocks de queries ─────────────────────────────────────────────────────────
 
 vi.mock('../../src/queries/products/get-product.query.js', () => ({
@@ -33,6 +41,8 @@ vi.mock('../../src/queries/products/list-products.query.js', async (importOrigin
 const { buildApp } = await import('../../src/app.js')
 const { createProductCommand } = await import('../../src/commands/products/create-product.command.js')
 const { createVariantCommand } = await import('../../src/commands/products/create-variant.command.js')
+const { deleteProductCommand } = await import('../../src/commands/products/delete-product.command.js')
+const { deleteVariantCommand } = await import('../../src/commands/products/delete-variant.command.js')
 const { getProductQuery } = await import('../../src/queries/products/get-product.query.js')
 const { listProductsQuery } = await import('../../src/queries/products/list-products.query.js')
 const { NotFoundError, ConflictError } = await import('../../src/helpers/errors.js')
@@ -177,5 +187,47 @@ describe('POST /products/:id/variants', () => {
     })
 
     expect(res.statusCode).toBe(409)
+  })
+})
+
+// ─── DELETE /products/:id ────────────────────────────────────────────────────
+
+describe('DELETE /products/:id', () => {
+  it('retorna 204 quando produto é deletado com sucesso', async () => {
+    vi.mocked(deleteProductCommand).mockResolvedValue(undefined)
+
+    const res = await app.inject({ method: 'DELETE', url: '/products/prod-1' })
+
+    expect(res.statusCode).toBe(204)
+    expect(deleteProductCommand).toHaveBeenCalledWith('prod-1')
+  })
+
+  it('retorna 404 quando produto não existe', async () => {
+    vi.mocked(deleteProductCommand).mockRejectedValue(new NotFoundError('Produto não encontrado'))
+
+    const res = await app.inject({ method: 'DELETE', url: '/products/nao-existe' })
+
+    expect(res.statusCode).toBe(404)
+  })
+})
+
+// ─── DELETE /products/:id/variants/:variantId ────────────────────────────────
+
+describe('DELETE /products/:id/variants/:variantId', () => {
+  it('retorna 204 quando variante é deletada com sucesso', async () => {
+    vi.mocked(deleteVariantCommand).mockResolvedValue(undefined)
+
+    const res = await app.inject({ method: 'DELETE', url: '/products/prod-1/variants/var-1' })
+
+    expect(res.statusCode).toBe(204)
+    expect(deleteVariantCommand).toHaveBeenCalledWith('prod-1', 'var-1')
+  })
+
+  it('retorna 404 quando variante não existe', async () => {
+    vi.mocked(deleteVariantCommand).mockRejectedValue(new NotFoundError('Variante não encontrada'))
+
+    const res = await app.inject({ method: 'DELETE', url: '/products/prod-1/variants/nao-existe' })
+
+    expect(res.statusCode).toBe(404)
   })
 })

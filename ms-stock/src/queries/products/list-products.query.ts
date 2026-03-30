@@ -21,8 +21,8 @@ export async function listProductsQuery(input: ListProductsInput): Promise<Pagin
   const { page, limit, search } = input
   const offset = (page - 1) * limit
 
-  let query = db.selectFrom('products').selectAll()
-  let countQuery = db.selectFrom('products').select(db.fn.countAll<number>().as('total'))
+  let query = db.selectFrom('products').selectAll().where('deleted_at', 'is', null)
+  let countQuery = db.selectFrom('products').select(db.fn.countAll<number>().as('total')).where('deleted_at', 'is', null)
 
   if (search) {
     query = query.where('name', 'ilike', `%${search}%`)

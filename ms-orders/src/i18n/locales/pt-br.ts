@@ -12,6 +12,8 @@ export const ptBR = {
     stock_release_failed: 'Não foi possível liberar o estoque para a variante {{variantId}}',
     stock_consume_failed: 'Não foi possível confirmar o consumo de estoque para a variante {{variantId}}',
     stock_url_required: 'A variável de ambiente STOCK_SERVICE_URL é obrigatória',
+    invalid_date_range: 'Data inicial deve ser anterior à data final',
+    rate_limit_exceeded: 'Limite de requisições excedido. Tente novamente em breve',
   },
   order_status: {
     open: 'aberto',

@@ -30,7 +30,18 @@ interface ConsumeParams {
   idempotencyKey: string
 }
 
-// ─── Helper interno ───────────────────────────────────────────────────────────
+// ─── Helpers internos ─────────────────────────────────────────────────────────
+
+async function get<T>(path: string): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`)
+  if (!res.ok) {
+    const payload = await res.json().catch(() => ({}))
+    const error = (payload as { error?: unknown }).error
+    const message = typeof error === 'string' ? error : JSON.stringify(error) ?? res.statusText
+    throw new BusinessError(message)
+  }
+  return res.json() as Promise<T>
+}
 
 async function post(path: string, body: object): Promise<void> {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -51,7 +62,24 @@ async function post(path: string, body: object): Promise<void> {
 
 // ─── API pública do cliente ───────────────────────────────────────────────────
 
+interface VariantInfo {
+  id: string
+  name: string
+  sku: string
+  price: number
+}
+
 export const stockClient = {
+  async getVariantPrice(variantId: string): Promise<number> {
+    try {
+      const data = await get<VariantInfo>(`/products/variants/${variantId}`)
+      return data.price
+    } catch (err) {
+      if (err instanceof BusinessError) throw err
+      throw new BusinessError(t('errors.stock_service_unavailable'))
+    }
+  },
+
   async reserve(params: ReserveParams): Promise<void> {
     try {
       await post(`/stock/${params.variantId}/reserve`, {

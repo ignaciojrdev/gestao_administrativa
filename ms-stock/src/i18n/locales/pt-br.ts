@@ -10,5 +10,6 @@ export const ptBR = {
     insufficient_reserved: 'Reserva insuficiente: reservado {{reserved}}, solicitado {{requested}}',
     stock_out_exceeds_available: 'Saída de {{requested}} excede o disponível ({{available}})',
     duplicate_event: 'Evento {{eventId}} já foi processado',
+    rate_limit_exceeded: 'Limite de requisições excedido. Tente novamente em breve',
   },
 } as const

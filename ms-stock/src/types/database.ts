@@ -6,6 +6,7 @@ export interface ProductsTable {
   id: Generated<string>
   name: string
   description: string | null
+  deleted_at: Date | null
   created_at: Generated<Date>
 }
 
@@ -20,6 +21,8 @@ export interface ProductVariantsTable {
   product_id: string
   name: string
   sku: string
+  price: number
+  deleted_at: Date | null
   created_at: Generated<Date>
 }
 

@@ -7,6 +7,7 @@ import { z } from 'zod'
 export const CreateVariantSchema = z.object({
   name: z.string().min(1).max(255),
   sku: z.string().min(1).max(100),
+  price: z.number().nonnegative().default(0),
 })
 
 export type CreateVariantInput = z.infer<typeof CreateVariantSchema>
@@ -19,6 +20,7 @@ export async function createVariantCommand(
     .selectFrom('products')
     .select('id')
     .where('id', '=', productId)
+    .where('deleted_at', 'is', null)
     .executeTakeFirst()
 
   if (!product) {
@@ -29,6 +31,7 @@ export async function createVariantCommand(
     .selectFrom('product_variants')
     .select('id')
     .where('sku', '=', input.sku)
+    .where('deleted_at', 'is', null)
     .executeTakeFirst()
 
   if (existing) {
@@ -39,7 +42,7 @@ export async function createVariantCommand(
 
   await db
     .insertInto('product_variants')
-    .values({ id, product_id: productId, name: input.name, sku: input.sku })
+    .values({ id, product_id: productId, name: input.name, sku: input.sku, price: input.price, deleted_at: null })
     .execute()
 
   return { id }

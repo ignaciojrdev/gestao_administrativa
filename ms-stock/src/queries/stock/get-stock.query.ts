@@ -16,6 +16,7 @@ export async function getStockQuery(variantId: string): Promise<StockDetail> {
     .selectFrom('product_variants')
     .select('id')
     .where('id', '=', variantId)
+    .where('deleted_at', 'is', null)
     .executeTakeFirst()
 
   if (!variant) {

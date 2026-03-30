@@ -7,7 +7,7 @@ export interface ProductDetail {
   name: string
   description: string | null
   created_at: Date
-  variants: Array<{ id: string; name: string; sku: string; created_at: Date }>
+  variants: Array<{ id: string; name: string; sku: string; price: number; created_at: Date }>
 }
 
 export async function getProductQuery(productId: string): Promise<ProductDetail> {
@@ -15,6 +15,7 @@ export async function getProductQuery(productId: string): Promise<ProductDetail>
     .selectFrom('products')
     .selectAll()
     .where('id', '=', productId)
+    .where('deleted_at', 'is', null)
     .executeTakeFirst()
 
   if (!product) {
@@ -23,8 +24,9 @@ export async function getProductQuery(productId: string): Promise<ProductDetail>
 
   const variants = await db
     .selectFrom('product_variants')
-    .select(['id', 'name', 'sku', 'created_at'])
+    .select(['id', 'name', 'sku', 'price', 'created_at'])
     .where('product_id', '=', productId)
+    .where('deleted_at', 'is', null)
     .orderBy('created_at', 'asc')
     .execute()
 

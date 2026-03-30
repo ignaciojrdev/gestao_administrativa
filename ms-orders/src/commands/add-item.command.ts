@@ -22,7 +22,10 @@ export async function addItemCommand(
   const itemId = randomUUID()
   const eventId = randomUUID()
 
-  // 1. Reserva o estoque antes de persistir o evento
+  // 1. Busca o preço da variante no momento do pedido (price snapshot)
+  const unitPrice = await stockClient.getVariantPrice(input.variant_id)
+
+  // 2. Reserva o estoque antes de persistir o evento
   //    Se falhar, o pedido não é alterado
   await stockClient.reserve({
     variantId: input.variant_id,
@@ -31,11 +34,11 @@ export async function addItemCommand(
     idempotencyKey: eventId,
   })
 
-  // 2. Persiste o evento com o mesmo eventId usado como chave de idempotência
+  // 3. Persiste o evento com o mesmo eventId usado como chave de idempotência
   const event: DomainEvent<ItemAddedData> = {
     type: ORDER_EVENT_TYPE.ITEM_ADDED,
     order_id: orderId,
-    data: { item_id: itemId, variant_id: input.variant_id, quantity: input.quantity },
+    data: { item_id: itemId, variant_id: input.variant_id, quantity: input.quantity, unit_price: unitPrice },
   }
 
   await persistEvent(event, eventId)

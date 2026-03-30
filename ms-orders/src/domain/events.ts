@@ -10,6 +10,7 @@ export interface ItemAddedData {
   item_id: string
   variant_id: string
   quantity: number
+  unit_price: number
 }
 
 export interface ItemRemovedData {

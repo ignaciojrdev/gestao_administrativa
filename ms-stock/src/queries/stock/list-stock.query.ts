@@ -47,6 +47,7 @@ export async function listStockQuery(input: ListStockInput): Promise<PaginatedSt
       'sp.reserved',
       'sp.updated_at',
     ])
+    .where('pv.deleted_at', 'is', null)
 
   if (low_stock) {
     query = query.where(

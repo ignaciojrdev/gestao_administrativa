@@ -7,6 +7,7 @@ import { releaseStockCommand, ReleaseStockSchema } from '../commands/stock/relea
 import { consumeStockCommand, ConsumeStockSchema } from '../commands/stock/consume-stock.command.js'
 import { getStockQuery } from '../queries/stock/get-stock.query.js'
 import { listStockQuery, ListStockSchema } from '../queries/stock/list-stock.query.js'
+import { getStockHistoryQuery, StockHistorySchema } from '../queries/stock/get-stock-history.query.js'
 
 export async function stockRoute(app: FastifyInstance): Promise<void> {
   // ─── Queries ──────────────────────────────────────────────────────────────
@@ -20,6 +21,13 @@ export async function stockRoute(app: FastifyInstance): Promise<void> {
 
   app.get<{ Params: { variantId: string } }>('/stock/:variantId', async (request, reply) => {
     return reply.send(await getStockQuery(request.params.variantId))
+  })
+
+  app.get<{ Params: { variantId: string } }>('/stock/:variantId/history', async (request, reply) => {
+    const input = parseOrFail(StockHistorySchema, request.query, reply)
+    if (!input) return
+
+    return reply.send(await getStockHistoryQuery(request.params.variantId, input))
   })
 
   // ─── Commands ─────────────────────────────────────────────────────────────

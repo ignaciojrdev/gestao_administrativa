@@ -43,6 +43,11 @@ vi.mock('../../src/queries/stock/list-stock.query.js', async (importOriginal) =>
   return { ...mod, listStockQuery: vi.fn() }
 })
 
+vi.mock('../../src/queries/stock/get-stock-history.query.js', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('../../src/queries/stock/get-stock-history.query.js')>()
+  return { ...mod, getStockHistoryQuery: vi.fn() }
+})
+
 // ─── Imports após mocks ───────────────────────────────────────────────────────
 
 const { buildApp } = await import('../../src/app.js')
@@ -53,6 +58,7 @@ const { releaseStockCommand } = await import('../../src/commands/stock/release-s
 const { consumeStockCommand } = await import('../../src/commands/stock/consume-stock.command.js')
 const { getStockQuery } = await import('../../src/queries/stock/get-stock.query.js')
 const { listStockQuery } = await import('../../src/queries/stock/list-stock.query.js')
+const { getStockHistoryQuery } = await import('../../src/queries/stock/get-stock-history.query.js')
 const { NotFoundError, BusinessError } = await import('../../src/helpers/errors.js')
 
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000'
@@ -297,5 +303,48 @@ describe('POST /stock/:variantId/consume', () => {
     })
 
     expect(res.statusCode).toBe(422)
+  })
+})
+
+// ─── GET /stock/:variantId/history ──────────────────────────────────────────
+
+describe('GET /stock/:variantId/history', () => {
+  it('retorna 200 com histórico paginado', async () => {
+    const mockResult = {
+      data: [
+        { id: 'evt-1', type: 'STOCK_IN', data: { quantity: 10 }, created_at: '2026-01-01T00:00:00.000Z' },
+      ],
+      total: 1,
+      page: 1,
+      limit: 20,
+    }
+    vi.mocked(getStockHistoryQuery).mockResolvedValue(mockResult)
+
+    const res = await app.inject({ method: 'GET', url: '/stock/var-1/history' })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.json()).toEqual(mockResult)
+  })
+
+  it('passa parâmetros de paginação para a query', async () => {
+    vi.mocked(getStockHistoryQuery).mockResolvedValue({ data: [], total: 0, page: 2, limit: 10 })
+
+    await app.inject({ method: 'GET', url: '/stock/var-1/history?page=2&limit=10' })
+
+    expect(getStockHistoryQuery).toHaveBeenCalledWith(
+      'var-1',
+      expect.objectContaining({ page: 2, limit: 10 }),
+    )
+  })
+
+  it('usa valores padrão quando paginação não é informada', async () => {
+    vi.mocked(getStockHistoryQuery).mockResolvedValue({ data: [], total: 0, page: 1, limit: 20 })
+
+    await app.inject({ method: 'GET', url: '/stock/var-1/history' })
+
+    expect(getStockHistoryQuery).toHaveBeenCalledWith(
+      'var-1',
+      expect.objectContaining({ page: 1, limit: 20 }),
+    )
   })
 })

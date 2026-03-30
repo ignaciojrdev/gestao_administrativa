@@ -5,12 +5,15 @@ import { t } from '../i18n/index.js'
 export interface OrderDetail {
   id: string
   status: string
+  table_number: number | null
+  total: number
   created_at: Date
   updated_at: Date
   items: Array<{
     id: string
     variant_id: string
     quantity: number
+    unit_price: number
     status: string
     created_at: Date
   }>
